@@ -1,34 +1,68 @@
 // Import Crates
+use std::fs;
+
+use sha2::{Sha256, Digest};
 
 fn merkle_root(filename: String) -> String {
+
     // Read Input Data from txt file
-    todo!()
+    let contents = fs::read_to_string(filename)
+        .expect("Should have been able to read the file");
+    println!("{contents}");
+
+    
+    // got words
+    let splitted_words = contents.split("\n");
+    
+    // got vector of words
+    let mut words = splitted_words.collect::<Vec<&str>>();
+
+    // remove number
+    let number  = words.remove(0);
 
     // Create vector of strings for leaves
-    
+    let mut hashed_words : Vec<String> = Vec::new();
 
-    // Hash inputs and append to vector
-    
+    // push hashed inputs to vector
+    for word in words{
+        println!("{word}");
+        hashed_words.push(hash_single_input(word));
+    }
 
-    // Then Write an algorithm that calculates the ROOT
+    // take first two member of vector
+    // concat and hash members then push to vector
+    // continues until there is only one element int the vector
+    while hashed_words.len() != 1 {
+        let mut first_member = hashed_words.remove(0).to_string();
+        let  second_member = hashed_words.remove(0).to_string();
+        println!("{second_member}");
+        first_member.push_str(&second_member);
+        hashed_words.push(hash_single_input(&first_member));
+    }
 
+    let final_hash = hashed_words.remove(0);
+    println!("{final_hash}");
+    return final_hash;
 
-    // Return the root hash as a String
 }
 
-// You can use templates below or just remove
-// Helper function to create a next leaves level may help you :)
-fn create_next_level(current_level: Vec::<String>) -> Vec::<String> {
-    todo!();
-}
 
+fn hash_single_input(a: &str) -> String {
+    let mut hasher = Sha256::new();
+    let input = a;
+    hasher.update(input);
+    let hash = hasher.finalize();
+    let hex = hex::encode(&hash);
 
-// Helper function may help you to hash an input or You can write macro rules
-fn hash_input(a: &str) -> String {
-    todo!();
+    return hex.to_string();
 }
 
 fn main() { 
+merkle_root("input0.txt".to_string());
+merkle_root("input1.txt".to_string());
+merkle_root("input2.txt".to_string());
+merkle_root("input3.txt".to_string());
+merkle_root("input4.txt".to_string());
 
 }
 
